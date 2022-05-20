@@ -1,4 +1,5 @@
 using API.Data;
+using API.Middleware;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +7,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+
+using System;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
+using Microsoft.Extensions.Azure;
 
 namespace API
 {
@@ -21,6 +27,9 @@ namespace API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var client = new SecretClient(new Uri(Configuration.GetSection("KeyVault:Uri").Value), new InteractiveBrowserCredential());
+            var secret = client.GetSecret(Configuration.GetSection("KeyVault:Secret:Name").Value,
+                Configuration.GetSection("KeyVault:Secret:Version").Value);
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -29,7 +38,7 @@ namespace API
             });
             services.AddDbContext<StoreContext>(opt =>
             {
-                opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"), providerOpt => providerOpt.EnableRetryOnFailure());
+                opt.UseSqlServer(secret.Value.Value, providerOpt => providerOpt.EnableRetryOnFailure());
             });
             services.AddCors();
         }
@@ -37,9 +46,11 @@ namespace API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseMiddleware<ExceptionMiddleware>();
+
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                //app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebAPIv5 v1"));
             }

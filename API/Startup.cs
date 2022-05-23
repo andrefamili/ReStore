@@ -11,7 +11,6 @@ using Microsoft.OpenApi.Models;
 using System;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
-using Microsoft.Extensions.Azure;
 
 namespace API
 {
@@ -61,7 +60,7 @@ namespace API
 
             app.UseCors(opt =>
             {
-                opt.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000");
+                opt.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins("http://localhost:3000");
             });
 
             app.UseAuthorization();

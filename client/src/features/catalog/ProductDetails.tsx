@@ -20,7 +20,7 @@ import {
   addBasketItemAsync,
   removeBasketItemAsync,
 } from "../basket/basketSlice";
-import { fetchProductAsync, produdctSelectors } from "./catalogSlice";
+import { fetchProductAsync, productSelectors } from "./catalogSlice";
 
 export default function ProductDetails() {
   const { basket, status } = useAppSelector((state) => state.basket);
@@ -28,7 +28,7 @@ export default function ProductDetails() {
 
   const { id } = useParams<{ id: string }>();
   const product = useAppSelector((state) =>
-    produdctSelectors.selectById(state, id!)
+    productSelectors.selectById(state, id!)
   );
   const { status: productStatus } = useAppSelector((state) => state.catalog);
 

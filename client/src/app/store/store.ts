@@ -2,12 +2,14 @@ import { configureStore } from '@reduxjs/toolkit'
 import counterReducer from '../../features/contact/counterSlice'
 import basketReducer from "../../features/basket/basketSlice"
 import catalogReducer from '../../features/catalog/catalogSlice';
+import accountReducer from '../../features/account/accountSlice';
 
 export const store = configureStore({
     reducer: {
         counter: counterReducer,
         basket: basketReducer,
-        catalog: catalogReducer
+        catalog: catalogReducer,
+        account: accountReducer
     }
 });
 
